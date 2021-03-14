@@ -1,0 +1,42 @@
+﻿
+@model CryptoRate.Web.Models.CryptoRatesViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+<div>
+    @using (Html.BeginForm())
+    {
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.SelectedCryptoCurrency, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.SelectedCryptoCurrency, (IEnumerable<SelectListItem>)ViewBag.AllCurrencies, null, new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Show Prices" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+    }
+@if (Model != null && Model.Prices!=null)
+{
+foreach (var item in Model.Prices)
+{
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">@item.Key</h5>
+            <p class="card-text">@item.Value</p>
+
+        </div>
+    </div>
+}
+}
+</div>
