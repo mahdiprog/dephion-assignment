@@ -9,6 +9,7 @@ namespace Meetings.Infra.Identity
 {
     public class ApplicationUser : IdentityUser
     {
+        public string FullName { get; set; }
         public int OfficeId { get; set; }
     }
 }

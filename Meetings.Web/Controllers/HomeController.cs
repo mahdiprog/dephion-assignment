@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Meetings.Web.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
 
@@ -23,7 +23,7 @@ namespace Meetings.Web.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        public IActionResult Meetings()
         {
             return View();
         }
