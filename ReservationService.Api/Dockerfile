@@ -7,16 +7,21 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
-COPY ["CryptoRate.Web/CryptoRate.Web.csproj", "CryptoRate.Web/"]
-RUN dotnet restore "CryptoRate.Web/CryptoRate.Web.csproj"
+COPY ["ReservationService.Api/ReservationService.Api.csproj", "ReservationService.Api/"]
+COPY ["Common.Web/Common.Web.csproj", "Common.Web/"]
+COPY ["ReservationService.Infra/ReservationService.Infra.csproj", "ReservationService.Infra/"]
+COPY ["ReservationService.Application/ReservationService.Application.csproj", "ReservationService.Application/"]
+COPY ["Common.Application/Common.Application.csproj", "Common.Application/"]
+COPY ["ReservationService.Domain/ReservationService.Domain.csproj", "ReservationService.Domain/"]
+RUN dotnet restore "ReservationService.Api/ReservationService.Api.csproj"
 COPY . .
-WORKDIR "/src/CryptoRate.Web"
-RUN dotnet build "CryptoRate.Web.csproj" -c Release -o /app/build
+WORKDIR "/src/ReservationService.Api"
+RUN dotnet build "ReservationService.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "CryptoRate.Web.csproj" -c Release -o /app/publish
+RUN dotnet publish "ReservationService.Api.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "CryptoRate.Web.dll"]
+ENTRYPOINT ["dotnet", "ReservationService.Api.dll"]

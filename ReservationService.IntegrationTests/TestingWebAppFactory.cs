@@ -1,10 +1,10 @@
-﻿using CryptoRate.IntegrationTests.Common;
-using CryptoRate.Web;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using ReservationService.Api;
+using ReservationService.IntegrationTests.Common;
 
-namespace CryptoRate.IntegrationTests
+namespace ReservationService.IntegrationTests
 {
     public class TestingWebAppFactory<T> : WebApplicationFactory<Startup>
     {

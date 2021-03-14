@@ -1,17 +1,17 @@
+using System.Reflection;
+using AutoMapper;
+using Common.Application.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AspNetCoreRateLimit;
-using CryptoRate.Application;
+using Microsoft.OpenApi.Models;
+using ReservationService.Application;
+using ReservationService.Infra;
+using ReservationService.Infra.Persistence;
 
-namespace CryptoRate.Web
+namespace ReservationService.Api
 {
     public class Startup
     {
@@ -25,25 +25,17 @@ namespace CryptoRate.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddApplication(Configuration);
-            
-            //load general configuration from appsettings.json
-            services.Configure<ClientRateLimitOptions>(Configuration.GetSection("ClientRateLimiting"));
+            services.AddInfrastructure(Configuration);
+            services.AddApplication();
 
-            //load client rules from appsettings.json
-            services.Configure<ClientRateLimitPolicies>(Configuration.GetSection("ClientRateLimitPolicies"));
-
-            // inject counter and rules stores
-            services.AddSingleton<IClientPolicyStore, MemoryCacheClientPolicyStore>();
-            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
-            
-            services.AddHttpContextAccessor();
-            
-            // configuration (resolvers, counter key builders)
-            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
-            
-            services.AddControllersWithViews();
-            
+            services.AddControllers();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ReservationApi", Version = "v1" });
+            });
+            services.ConfigureBus(Configuration, "ReservationApi", Assembly.GetExecutingAssembly());
+            services.AddHealthChecks()
+                .AddDbContextCheck<ReservationDbContext>();
             
         }
 
@@ -53,39 +45,24 @@ namespace CryptoRate.Web
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApplication1 v1"));
             }
-            else
+
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+                serviceScope.ServiceProvider.GetRequiredService<ReservationDbContext>().Database.EnsureCreated();
             }
+
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
 
             app.UseRouting();
 
             app.UseAuthorization();
-            
-            //add XSS prevention header
-            app.Use(async (context, next) =>
-            {
-                context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
-                context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
-                context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-                context.Response.Headers.Add("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
-                context.Response.Headers.Add("Server", "");
-                context.Response.Headers.Add("X-Powered-By", "");
-                await next().ConfigureAwait(false);
-            });
-            
-            app.UseClientRateLimiting();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllers();
             });
         }
     }

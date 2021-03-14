@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CryptoRate.Web\CryptoRate.Web.csproj" />
+    <ProjectReference Include="..\ReservationService.Api\ReservationService.Api.csproj" />
   </ItemGroup>
 
 </Project>

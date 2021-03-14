@@ -1,0 +1,33 @@
+version: '3.4'
+
+services:
+  rabbitmq:
+   image: "rabbitmq:3-management"
+   hostname: "rabbitmq"
+   environment:
+     RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+     RABBITMQ_DEFAULT_USER: "rabbitmq"
+     RABBITMQ_DEFAULT_PASS: "rabbitmq"
+     RABBITMQ_DEFAULT_VHOST: "/"
+   ports:
+    - "15672:15672"
+    - "5672:5672"
+   healthcheck:
+      timeout: 5s
+      interval: 5s
+      retries: 5
+      test:
+        - "CMD"
+        - "rabbitmqctl"
+        - "status"
+   labels:
+     NAME: "rabbitmq"
+  
+   restart: always
+  reservationservice.api:
+    image: ${DOCKER_REGISTRY-}reservationserviceapi
+    depends_on:
+      ['rabbitmq']
+    build:
+      context: .
+      dockerfile: ReservationService.Api/Dockerfile

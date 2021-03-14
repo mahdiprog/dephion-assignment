@@ -1,23 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using AngleSharp.Html.Dom;
-using CryptoRate.IntegrationTests.Common;
-using CryptoRate.Web;
-using CryptoRate.Web.Controllers;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
-using RazorPagesProject.Tests.Helpers;
+using ReservationService.Api;
+using ReservationService.IntegrationTests.Common;
 using Xunit;
 
-namespace CryptoRate.IntegrationTests
+namespace ReservationService.IntegrationTests
 {
     #region snippet1
     public class IndexPageTests : 

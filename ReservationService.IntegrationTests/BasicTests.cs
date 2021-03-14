@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
-using CryptoRate.Web;
 using Microsoft.AspNetCore.Mvc.Testing;
+using ReservationService.Api;
 using Xunit;
 
-namespace CryptoRate.IntegrationTests
+namespace ReservationService.IntegrationTests
 {
     #region snippet1
     public class BasicTests 

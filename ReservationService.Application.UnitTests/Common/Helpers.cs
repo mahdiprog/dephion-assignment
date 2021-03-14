@@ -1,16 +1,13 @@
-﻿using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
+using Moq;
 using Moq.Protected;
 
-namespace CryptoRate.Application.UnitTests.Common
+namespace ReservationService.Application.UnitTests.Common
 {
     public static class Helpers
     {
