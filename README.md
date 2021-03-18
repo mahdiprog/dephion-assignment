@@ -7,8 +7,12 @@
 
 
 
- I've creted two separate microservice to show if I could do that (or maybe not)
+ I've created two separate microservice to show if I could do that (or maybe not)
+ Each microservice includes 3 projects for API, ApplicationCoe and Infrastructure
+ Messaging project has been used to share messages between microservices
  I've used MassTransit for comminucation between services. if the message handler should accept external messages (inter-microservice), it should implement IExternalConsomer interface. otherwise it will be used as internal message handler (messages inside a microservice by MediatR)
+ In memory databse has been used with EF
+
 
  *What skipped for now:*
 
