@@ -1,60 +1,78 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
+using FluentValidation.Results;
 using GreenPipes;
+using MassTransit;
+using MassTransit.ConsumeConfigurators;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Common.Application
 {
-    public class FluentValidationFilter<TContext> : IFilter<TContext>
-    where TContext : class, PipeContext
+    public class FluentValidationFilter<T> : IFilter<ConsumeContext<T>>
+        where T : class
     {
+        private readonly IValidator<T> _validator;
+
+        public FluentValidationFilter(IValidator<T> validator)
+        {
+            _validator = validator;
+        }
 
         public void Probe(ProbeContext context)
         {
-            var scope = context.CreateFilterScope("FluentValidation");
+            var scope = context.CreateScope("FluentValidation");
         }
 
-        public async Task Send(TContext context, IPipe<TContext> next)
+        public async Task Send(ConsumeContext<T> context, IPipe<ConsumeContext<T>> next)
         {
-            if (context.TryGetPayload(out IEnumerable<IValidator<TContext>> validators))
+
+            var failures = (await _validator.ValidateAsync(context.Message)).Errors;
+
+
+            if (failures.Any())
             {
-                var failures = validators
-                    .Select(v => v.Validate(context))
-                    .SelectMany(result => result.Errors)
-                    .Where(f => f != null)
-                    .ToList();
-
-                if (failures.Any())
-                {
-                    throw new ValidationException(failures);
-                }
-
+                throw new ValidationException(failures);
             }
+
             await next.Send(context);
-
         }
     }
-    public class FluentValidationSpecification<TContext> : IPipeSpecification<TContext>
-     where TContext : class, PipeContext
+    
+    public class FluentValidationConsumerConfigurationObserver :
+   IConsumerConfigurationObserver
     {
-        public IEnumerable<ValidationResult> Validate()
+        private readonly IServiceProvider _provider;
+
+        public FluentValidationConsumerConfigurationObserver(IServiceProvider provider)
         {
-            return Enumerable.Empty<ValidationResult>();
+            _provider = provider;
+            ConsumerTypes = new HashSet<Type>();
+            MessageTypes = new HashSet<Tuple<Type, Type>>();
         }
 
-        public void Apply(IPipeBuilder<TContext> builder)
+        public HashSet<Type> ConsumerTypes { get; }
+
+        public HashSet<Tuple<Type, Type>> MessageTypes { get; }
+
+        void IConsumerConfigurationObserver.ConsumerConfigured<TConsumer>(IConsumerConfigurator<TConsumer> configurator)
         {
-            builder.AddFilter(new FluentValidationFilter<TContext>());
+            ConsumerTypes.Add(typeof(TConsumer));
+        }
+
+        void IConsumerConfigurationObserver.ConsumerMessageConfigured<TConsumer, TMessage>(IConsumerMessageConfigurator<TConsumer, TMessage> configurator)
+        {
+            MessageTypes.Add(Tuple.Create(typeof(TConsumer), typeof(TMessage)));
+
+            var validator = _provider.GetService<IValidator<TMessage>>();
+            if (validator == null) return;
+            var filter = new FluentValidationFilter<TMessage>(validator);
+            configurator.Message(m => m.UseFilter(filter));
         }
     }
 
-    public static class FluentValidationExtensionMethods
-    {
-        public static void UseFluentValidation<TContext>(this IPipeConfigurator<TContext> configurator)
-            where TContext : class, PipeContext
-        {
-            configurator.AddPipeSpecification(new FluentValidationSpecification<TContext>());
-        }
-    }
+
+
 }

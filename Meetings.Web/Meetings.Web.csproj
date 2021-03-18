@@ -20,8 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Common.Web\Common.Web.csproj" />
     <ProjectReference Include="..\Meetings.Application\Meetings.Application.csproj" />
     <ProjectReference Include="..\Meetings.Infra\Meetings.Infra.csproj" />
+    <ProjectReference Include="..\ReservationService.Messaging\ReservationService.Messaging.csproj" />
   </ItemGroup>
 
 </Project>

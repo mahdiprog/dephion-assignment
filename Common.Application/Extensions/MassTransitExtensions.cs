@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Common.Application.Messaging;
+using GreenPipes;
 using GreenPipes.Internals.Extensions;
 using MassTransit;
 using MassTransit.ExtensionsDependencyInjectionIntegration.MultiBus;
@@ -51,7 +52,6 @@ namespace Common.Application.Extensions
             services.AddMediator(x =>
             {
                 x.AddConsumers(internals.ToArray());
-                x.ConfigureMediator((provider, cfg) => cfg.UseFluentValidation());
             });
             //services.AddMassTransit(x =>
             //{
@@ -64,26 +64,32 @@ namespace Common.Application.Extensions
             {
                 x.AddConsumers(externals.ToArray());
                 x.AddBus(provider =>
-                    config.BusType switch
+                {
+                    switch (config.BusType)
                     {
-                        BusType.AzureServiceBus => throw new NotImplementedException(),
-                        BusType.ActiveMQ => throw new NotImplementedException(),
-                        BusType.AmazonSQS => throw new NotImplementedException(),
-
-                        _ => Bus.Factory.CreateUsingRabbitMq(cfg =>
-                        {
-                            cfg.Host(new Uri(config.RabbitMQ.Address), h =>
+                        case BusType.AzureServiceBus:
+                        case BusType.ActiveMQ:
+                        case BusType.AmazonSQS:
+                            throw new NotImplementedException();
+                        default:
+                            var busControl=  Bus.Factory.CreateUsingRabbitMq(cfg =>
                             {
-                                h.Username(config.RabbitMQ.Username);
-                                h.Password(config.RabbitMQ.Password);
+                                cfg.Host(new Uri(config.RabbitMQ.Address), h =>
+                                {
+                                    h.Username(config.RabbitMQ.Username);
+                                    h.Password(config.RabbitMQ.Password);
+                                });
+
+                                cfg.ReceiveEndpoint(apiResourceName, ep => { ep.ConfigureConsumers(provider); });
+
+                                cfg.ConnectConsumerConfigurationObserver(
+                                    new FluentValidationConsumerConfigurationObserver(provider));
+                                //cfg.UseFluentValidation();
                             });
-
-                            cfg.ReceiveEndpoint(apiResourceName, ep => { ep.ConfigureConsumers(provider); });
-                            cfg.UseFluentValidation();
-                            
-                        })
-                    });
-
+                            return busControl;
+                    }
+                });
+                
                 postAction?.Invoke(x);
             });
 

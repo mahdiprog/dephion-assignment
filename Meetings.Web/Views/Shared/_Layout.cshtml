@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Meetings.Web</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" />
+    <link rel="stylesheet" href="~/lib/time-picker/dist/css/timepicker.css" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
@@ -37,7 +39,9 @@
     
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/lib/time-picker/dist/js/timepicker.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

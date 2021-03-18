@@ -5,9 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Resources\" />
-    <Folder Include="Rooms\" />
-    <Folder Include="Offices\" />
+    <PackageReference Include="FluentValidation" Version="9.5.0" />
   </ItemGroup>
 
 </Project>

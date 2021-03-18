@@ -12,6 +12,8 @@ namespace Common.Application.Extensions
                 .Where(a =>
                 !a.FullName.StartsWith("System") && 
                 !a.FullName.StartsWith("Microsoft") &&
+                !a.FullName.StartsWith("Swashbuckle") &&
+                !a.FullName.StartsWith("FluentValidation") &&
                 !a.FullName.StartsWith("MassTransit"))
                 .Select(Assembly.Load).Distinct();
         }

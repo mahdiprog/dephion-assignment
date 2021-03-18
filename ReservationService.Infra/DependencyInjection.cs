@@ -16,6 +16,7 @@ namespace ReservationService.Infra
                 //options.UseSqlServer(configuration.GetConnectionString("ReservationDbContext")));
 
                 services.AddScoped<IReservationDbContext>(provider => provider.GetService<ReservationDbContext>());
+                services.AddDatabaseDeveloperPageExceptionFilter();
             return services;
         }
     }

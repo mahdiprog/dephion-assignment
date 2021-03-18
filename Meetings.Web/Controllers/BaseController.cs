@@ -1,5 +1,4 @@
-﻿using MediatR;
-using Meetings.Infra.Identity;
+﻿using MassTransit.Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 

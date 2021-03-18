@@ -9,8 +9,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using Common.Application.Extensions;
+using FluentValidation.AspNetCore;
 using Meetings.Application.Interfaces;
 using Meetings.Infra;
 using Meetings.Infra.Identity;
@@ -18,6 +22,7 @@ using Meetings.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using ReservationService.Application;
+using ReservationService.Messaging.Offices;
 
 namespace Meetings.Web
 {
@@ -67,10 +72,16 @@ namespace Meetings.Web
                 options.User.RequireUniqueEmail = true;
             });
             services.AddScoped<ICurrentUserService, CurrentUserService>();
-
+            services.AddSingleton(Configuration);
             services.AddHttpContextAccessor();
-
-            services.AddControllersWithViews();
+            services.ConfigureBus(Configuration, "Meetings", Assembly.GetExecutingAssembly(),
+                cfg =>
+                {
+                    cfg.AddRequestClient<OfficeGetByIdQuery>();
+                });
+            services.AddControllersWithViews().AddFluentValidation(fv =>
+                fv.RegisterValidatorsFromAssemblies(
+                    Assembly.GetExecutingAssembly().GetProjectReferencedAssemblies()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -104,7 +115,7 @@ namespace Meetings.Web
             app.UseRouting();
 
             app.UseAuthentication();
-           // app.UseAuthorization();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

@@ -1,6 +1,112 @@
-﻿@{
+﻿@using System.Text.Json
+@model MeetingViewModel
+@{
     ViewData["Title"] = "Add a meeting";
 }
-<h1>@ViewData["Title"]</h1><h3> Office</h2>
+<h1>@ViewData["Title"]</h1>
+<h3>@Model.OfficeLocation Office</h3>
 
-<p>Use this page to detail your site's privacy policy.</p>
+@using (Html.BeginForm(FormMethod.Post, new { @class = "form-horizontal" }))
+{
+<fieldset>
+
+@Html.HiddenFor(m=>m.OfficeLocation)
+@Html.HiddenFor(m=>m.From)
+@Html.HiddenFor(m=>m.To)
+    <!-- Text input-->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="textinput">Meeting Date</label>
+        <div class="col-md-4">
+            <input id="inputDate" name="date" type="text"  class="form-control input-md datepicker">
+            
+        </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="textinput">From</label>
+        <div class="col-md-4">
+            <input id="inputFrom"  type="text" class="form-control input-md bs-timepicker">
+        </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="textinput">To</label>
+        <div class="col-md-4">
+            <input id="inputTo"  type="text"  class="form-control input-md bs-timepicker">
+        </div>
+    </div>
+
+    <!-- Select Basic -->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="selectbasic">Room</label>
+        <div class="col-md-4">
+            @Html.DropDownListFor(n => n.RoomId, 
+            new SelectList(Model.Rooms, "RoomId", "Name"),
+                "Select a Room",new { @class = "form-control" })
+        </div>
+    </div>
+
+    <!-- Select Basic -->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="selectbasic">Select Basic</label>
+        <div class="col-md-4">
+            @Html.DropDownListFor(n => n.MovableResourceId, 
+                new SelectList(Model.MovableResources, "ResourceId", "Name"),
+                "Select a Resource to reserve",new { @class = "form-control" })
+        </div>
+    </div>
+
+    <!-- Button -->
+    <div class="form-group">
+        <div class="col-md-4">
+            <button type="submit" name="singlebutton" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
+<div class="form-group">
+    @foreach (var error in Model.ValidationErrors)
+    {
+        <div class="col-md-4"><div class="text-danger">@error</div></div>
+    }
+</div>
+</fieldset>
+}
+
+@section Scripts
+{
+    <script type="text/javascript">
+$(document).ready(function () {
+   $(".datepicker").datepicker({
+      dateFormat: "dd/mm/yy",
+      changemonth: true,
+      changeyear: true
+      }).on("changeDate",setDates);
+
+      $('.bs-timepicker').timepicker().on('changeTime.timepicker',setDates);
+      
+   });
+   //$("form").submit(setDates);
+
+   function setDates(){
+       
+       let toDate = $("#inputDate").datepicker('getDate');
+       let fromDate = $("#inputDate").datepicker('getDate');
+       
+       let fromTime = parseTime($('#inputFrom').val());
+       let toTime = parseTime($('#inputTo').val());
+       if(fromTime && toTime){
+       fromDate.setHours(fromTime.getHours(),fromTime.getMinutes(),0);
+       toDate.setHours(toTime.getHours(),toTime.getMinutes(),0);
+       $('#From').val(fromDate.toISOString())
+       $('#To').val(toDate.toISOString())}
+   }
+   function parseTime( t ) {
+   var d = new Date();
+   var time = t.match( /(\d+)(?::(\d\d))?\s*(p?)/ );
+   d.setHours( parseInt( time[1]) + (time[3] ? 12 : 0) );
+   d.setMinutes( parseInt( time[2]) || 0 );
+   return d;
+}
+</script>
+}
