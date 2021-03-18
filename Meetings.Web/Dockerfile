@@ -8,6 +8,12 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
 COPY ["Meetings.Web/Meetings.Web.csproj", "Meetings.Web/"]
+COPY ["Meetings.Application/Meetings.Application.csproj", "Meetings.Application/"]
+COPY ["ReservationService.Messaging/ReservationService.Messaging.csproj", "ReservationService.Messaging/"]
+COPY ["Common.Application/Common.Application.csproj", "Common.Application/"]
+COPY ["Meetings.Domain/Meetings.Domain.csproj", "Meetings.Domain/"]
+COPY ["Meetings.Infra/Meetings.Infra.csproj", "Meetings.Infra/"]
+COPY ["Common.Web/Common.Web.csproj", "Common.Web/"]
 RUN dotnet restore "Meetings.Web/Meetings.Web.csproj"
 COPY . .
 WORKDIR "/src/Meetings.Web"

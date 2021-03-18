@@ -31,3 +31,10 @@ services:
     build:
       context: .
       dockerfile: ReservationService.Api/Dockerfile
+
+  meetings.web:
+    image: ${DOCKER_REGISTRY-}meetingsweb
+    build:
+      context: .
+      dockerfile: Meetings.Web/Dockerfile
+

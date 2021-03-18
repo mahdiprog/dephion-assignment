@@ -11,8 +11,8 @@ namespace Meetings.Infra
         {
 
             services.AddDbContext<AppIdentityDbContext>(options =>
-                //options.UseInMemoryDatabase("Identity"));
-                options.UseSqlServer(configuration.GetConnectionString("ReservationDbContext")));
+                options.UseInMemoryDatabase("ReservationDbContext"));
+                //options.UseSqlServer(configuration.GetConnectionString("ReservationDbContext")));
             return services;
         }
     }
