@@ -9,7 +9,7 @@
 
 
 
-
+**Important points:**
 
  - I've created two separate microservice to show if I could do that (or maybe not)
  - Each microservice includes 3 projects for API, ApplicationCoe and
